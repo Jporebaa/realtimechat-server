@@ -11,3 +11,5 @@ https://porebajakub.atlassian.net/jira/software/projects/REALTIME/boards/2/backl
 
 repozytorium aplikacji serwerowej:
 https://github.com/Jporebaa/realtimechat-server.git
+
+Test
