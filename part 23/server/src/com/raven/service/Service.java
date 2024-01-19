@@ -8,6 +8,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.raven.app.MessageType;
+import com.raven.connection.DatabaseConnection;
 import com.raven.model.Model_Client;
 import com.raven.model.Model_File;
 import com.raven.model.Model_Login;
@@ -20,6 +21,8 @@ import com.raven.model.Model_Reques_File;
 import com.raven.model.Model_Send_Message;
 import com.raven.model.Model_User_Account;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +102,7 @@ public class Service {
             @Override
             public void onData(SocketIOClient sioc, Model_Send_Message t, AckRequest ar) throws Exception {
                 sendToClient(t, ar);
+                saveMessageToDatabase(t); // Dodano zapis do bazy danych
             }
         });
         server.addEventListener("send_file", Model_Package_Sender.class, new DataListener<Model_Package_Sender>() {
@@ -154,6 +158,24 @@ public class Service {
         });
         server.start();
         textArea.append("Server has Start on port : " + PORT_NUMBER + "\n");
+    }
+
+    private void saveMessageToDatabase(Model_Send_Message message) {
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            if (connection != null) {
+                String query = "INSERT INTO messages (message_type, from_user_id, to_user_id, text) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setInt(1, message.getMessageType());
+                    preparedStatement.setInt(2, message.getFromUserID());
+                    preparedStatement.setInt(3, message.getToUserID());
+                    preparedStatement.setString(4, message.getText());
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void userConnect(int userID) {
