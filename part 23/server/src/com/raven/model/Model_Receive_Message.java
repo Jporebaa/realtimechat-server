@@ -1,6 +1,10 @@
 package com.raven.model;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 public class Model_Receive_Message {
+
 
     public int getMessageType() {
         return messageType;
@@ -34,6 +38,22 @@ public class Model_Receive_Message {
         this.dataImage = dataImage;
     }
 
+    public Timestamp getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Timestamp createDate) {
+        this.createDate = createDate;
+    }
+
+    public Model_Receive_Message(int messageType, int fromUserID, String text, Model_Receive_Image dataImage, Timestamp createDate) {
+        this.messageType = messageType;
+        this.fromUserID = fromUserID;
+        this.text = text;
+        this.dataImage = dataImage;
+        this.createDate = createDate;
+    }
+
     public Model_Receive_Message(int messageType, int fromUserID, String text, Model_Receive_Image dataImage) {
         this.messageType = messageType;
         this.fromUserID = fromUserID;
@@ -48,4 +68,5 @@ public class Model_Receive_Message {
     private int fromUserID;
     private String text;
     private Model_Receive_Image dataImage;
+    private Timestamp createDate;
 }

@@ -9,17 +9,8 @@ import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.raven.app.MessageType;
 import com.raven.connection.DatabaseConnection;
-import com.raven.model.Model_Client;
-import com.raven.model.Model_File;
-import com.raven.model.Model_Login;
-import com.raven.model.Model_Message;
-import com.raven.model.Model_Package_Sender;
-import com.raven.model.Model_Receive_Image;
-import com.raven.model.Model_Receive_Message;
-import com.raven.model.Model_Register;
-import com.raven.model.Model_Reques_File;
-import com.raven.model.Model_Send_Message;
-import com.raven.model.Model_User_Account;
+import com.raven.model.*;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +24,7 @@ public class Service {
     private static Service instance;
     private SocketIOServer server;
     private ServiceUser serviceUser;
+    private ServiceMessage serviceMessage;
     private ServiceFIle serviceFile;
     private List<Model_Client> listClient;
     private JTextArea textArea;
@@ -48,6 +40,7 @@ public class Service {
     private Service(JTextArea textArea) {
         this.textArea = textArea;
         serviceUser = new ServiceUser();
+        serviceMessage = new ServiceMessage();
         serviceFile = new ServiceFIle();
         listClient = new ArrayList<>();
     }
@@ -87,6 +80,16 @@ public class Service {
                 }
             }
         });
+
+        server.addEventListener("get_messages", Model_All_Messages.class, new DataListener<Model_All_Messages>() {
+            @Override
+            public void onData(SocketIOClient sioc, Model_All_Messages t, AckRequest ar) throws Exception {
+                List<Model_Receive_Message> data = serviceMessage.getAllMessages(t);
+                ar.sendAckData(data.toArray());
+            }
+        });
+
+
         server.addEventListener("list_user", Integer.class, new DataListener<Integer>() {
             @Override
             public void onData(SocketIOClient sioc, Integer userID, AckRequest ar) throws Exception {
